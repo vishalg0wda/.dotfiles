@@ -1,0 +1,10 @@
+#!/usr/bin/env zsh
+export DOTFILES="$HOME/.dotfiles"
+export CONFIG_HOME=$HOME/.config
+export ZDOTDIR="$CONFIG_HOME/zsh"
+export CLICOLOR=1
+export HISTFILE="$ZDOTDIR/.zhistory"    # History filepath
+export HISTSIZE=1000000                   # Maximum events for internal history
+export SAVEHIST=1000000                   # Maximum events in history file
+export PATH="${PATH}:$HOME/bin:$HOME/baga/includes:$HOME/.emacs.d/bin:/opt/homebrew/bin"
+export EDITOR="emacs -nw"
