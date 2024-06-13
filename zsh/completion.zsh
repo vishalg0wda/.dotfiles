@@ -18,6 +18,7 @@ fpath=(
     $DOTFILES/zsh/plugins/zsh-completions/src
     $DOTFILES/zsh/plugins/kubectl-completion
     $DOTFILES/zsh/plugins/docker-completion
+    $DOTFILES/zsh/plugins/helm-completion
     $fpath)
 
 # Should be called before compinit
