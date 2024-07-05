@@ -1,0 +1,408 @@
+
+(setq inhibit-startup-message t ; Don't show the splash screen
+      visible-bell t)           ; Flash when the bell rings
+
+;; Initialize package sources
+(require 'package)
+
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+			             ("org" . "https://orgmode.org/elpa/")
+			             ("elpa" . "https://elpa.gnu.org/packages/")))
+
+(package-initialize)
+(unless package-archive-contents
+  (package-refresh-contents))
+
+;; Initialize use-package on non-Linux platforms
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+
+(require 'use-package)
+(setq use-package-always-ensure t)
+
+;; Turn off some unneeded UI elements
+(scroll-bar-mode -1)    ; Disable visible scrollbar
+(tool-bar-mode -1)      ; Disible the toolbar
+(tooltip-mode -1)       ; Disable tooltips
+(set-fringe-mode 10)    ; Give some breathing room
+
+(menu-bar-mode -1)      ; Disable the menu bar
+;; More UI tweaks   
+(blink-cursor-mode -1)
+(use-package hl-line
+  :ensure nil
+  :custom-face (hl-line ((t (:extend t))))
+  :hook (after-init . global-hl-line-mode))
+
+(use-package recentf
+  :config
+  (setq recentf-exclude '("COMMIT_MSG" "COMMIT_EDITMSG" "github.*txt$"
+                          "[0-9a-f]\\{32\\}-[0-9a-f]\\{32\\}\\.org" ".*png$" ".*cache$"))
+  (setq recentf-max-saved-items 500))
+
+;; Save what you enter into minibuffer prompts
+(setq history-length 25)
+(savehist-mode 1)
+
+;; Remember and restore the last cursor location of opened files
+(save-place-mode 1)
+
+
+;; Move customization variables to a separate file and load it
+(setq custom-file (locate-user-emacs-file "custom-vars.el"))
+(load custom-file 'noerror 'nomessage)
+
+
+;; (set-face-attribute 'default nil :family "Input Mono Compressed" :height 120)
+
+(set-face-attribute 'default nil :family "DejaVu Sans Mono")
+(setq-default fill-column 90)
+
+;; Display line numbers in every buffer
+(global-display-line-numbers-mode 1)
+
+;; Load the Modus Vivendi dark theme
+(load-theme 'tango-dark t)
+
+;; Make ESC quit prompts
+(keymap-global-set "C-g" 'keyboard-escape-quit)
+
+;; Don't pop up UI dialogs when prompting
+(setq use-dialog-box nil)
+
+;; Place all auto-save files in one directory
+(setq my-backup-dir (concat user-emacs-directory "backups"))
+(setq backup-directory-alist
+      `((".*" . ,my-backup-dir)))
+(setq auto-save-file-name-transforms
+      `((".*" ,my-backup-dir t)))
+
+
+(use-package fontawesome)
+(use-package all-the-icons)
+
+(use-package command-log-mode)
+;; (setq global-command-log-mode 1)
+
+(use-package swiper :ensure t)
+(use-package ivy
+  :init (ivy-mode 1)
+  :config
+  (setq ivy-use-virtual-buffers t
+        enable-recursive-minibuffers t
+        ivy-display-style 'fancy
+        ivy-re-builders-alist '((ivy-bibtex . ivy--regex-ignore-order)
+                                (t . ivy--regex-plus)))
+  :bind (("C-s" . 'swiper-isearch)
+         ("C-r" . 'swiper-backward)))
+
+(use-package counsel
+  :init (counsel-mode t)
+  :bind (("C-c r" . 'counsel-recentf)
+	     ("C-x C-f" . 'counsel-find-file)
+         ("C-c i" . 'counsel-imenu)
+         ;; ("C-c c" . 'counsel-org-capture)
+         ("C-x b" . 'ivy-switch-buffer))
+  :config
+  (setq counsel-grep-base-command "grep -niE %s %s")
+  (setq counsel-grep-base-command
+        ;; "ag --nocolor --nogroup %s %s")
+        "rg -S -M 120 --no-heading --line-number --color never %s %s")
+  (setq counsel-find-file-occur-cmd
+        "gls -a | grep -i -E '%s' | gxargs -d '\\n' gls -d --group-directories-first")
+  (setq counsel-locate-cmd 'counsel-locate-cmd-mdfind))
+
+(use-package prescient
+  :config
+  (prescient-persist-mode))
+
+(use-package ivy-prescient
+  :config (ivy-prescient-mode))
+
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1)
+  :custom ((doom-modeline-height 15)))
+
+(use-package diminish)
+
+(use-package modus-themes
+  :init
+  (setq modus-themes-bold-constructs t
+        modus-themes-completions '((matches . (extrabold intense background))
+                                   (selection . (semibold accented intense))
+                                   (popup . (accented)))
+        modus-themes-diffs 'desaturated
+        modus-themes-headings '((1 . (1.2))
+                                (2 . (rainbow 1.1))
+                                (3 . (1))
+                                (t . (monochrome)))
+        modus-themes-hl-line '(nil)
+        modus-themes-links '(nil)
+        modus-themes-mixed-fonts nil
+        modus-themes-mode-line '(moody borderless accented)
+        modus-themes-tabs-accented t
+        modus-themes-prompts '(background)
+        modus-themes-region '(accented bg-only)
+        modus-themes-syntax '(faint)
+        modus-themes-tabs-accented nil
+        )
+  (setq modus-themes-org-agenda
+        '((header-date . (grayscale workaholic bold-today))
+          (header-block . (1.5 semibold))
+          (scheduled . uniform)
+          (event . (italic))
+          (habit . traffic-light)))
+  ;; (modus-themes-load-themes)
+  ;; :config
+  ;; (modus-themes-load-operandi)
+  :bind ("<f5>" . modus-themes-toggle))
+
+
+(use-package ivy-hydra)
+
+(use-package which-key
+  :diminish
+  :init
+  (progn
+    (setq which-key-idle-delay 1.0)
+    (which-key-mode)))
+
+
+(setq-default indent-tabs-mode nil
+              tab-always-indent 'complete
+              tab-width 4)
+
+(setq sentence-end-double-space nil)
+
+
+(add-hook 'text-mode-hook #'auto-fill-mode)
+
+
+(setq large-file-warning-threshold 100000000)
+
+(use-package avy
+  :bind (("M-j" . 'avy-goto-char-timer)
+         ("M-\\" . 'avy-goto-line)))
+
+(use-package ace-window
+  :config
+  (set-face-attribute
+   'aw-leading-char-face nil
+   :weight 'bold
+   :height 2.0)
+  (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+  :bind (("M-o" . 'ace-window)))
+
+
+(use-package multiple-cursors
+  :bind (("C-S-c C-S-c" . mc/edit-lines)
+         ("C->"         . mc/mark-next-like-this)
+         ("C-<"         . mc/mark-previous-like-this)
+         ("C-c C-<"     . mc/mark-all-like-this)
+         ("M-<down-mouse-1>" . mc/add-cursor-on-click)
+         ;; ("C-c m" . vr/mc-mark)
+         ))
+
+(use-package expand-region
+  :bind (("C-=" . er/expand-region)
+         ("C--" . er/contract-region)))
+
+(use-package electric
+  :ensure nil
+  :config (electric-pair-mode 1))
+
+(use-package olivetti
+  :config (setq olivetti-style 'fancy))
+
+(use-package csv-mode
+  :defer t)
+
+(use-package yaml-mode
+  :mode (("\\.yml\\'" . yaml-mode)))
+
+
+(use-package dirvish
+  :init
+  (dirvish-override-dired-mode)
+  :custom
+  (dirvish-quick-access-entries
+   '(("h" "~/"                          "Home")
+     ("d" "~/.config/emacs/"                 "Emacs")
+     ("c" "~/code"                  "Code")
+     ("n" "~/notes" "Notes")))
+  (dirvish-mode-line-format
+   '(:left (sort file-time " " file-size symlink) :right (omit yank index)))
+  ;; Don't worry, Dirvish is still performant even you enable all these attributes
+  (dirvish-attributes '(all-the-icons collapse subtree-state vc-state git-msg))
+  :config
+  (setq dired-dwim-target t)
+  (setq delete-by-moving-to-trash t)
+  ;; Enable mouse drag-and-drop files to other applications
+  (setq dired-mouse-drag-files t)                   ; added in Emacs 29
+  (setq mouse-drag-and-drop-region-cross-program t) ; added in Emacs 29
+  (setq dired-listing-switches
+        "-l --almost-all --human-readable --time-style=long-iso --group-directories-first --no-group")
+  :bind
+  ;; Bind `dirvish|dirvish-side|dirvish-dwim' as you see fit
+  (("C-c d" . dirvish)
+   ("C-c f" . dirvish-fd)
+   ;; Dirvish has all the keybindings in `dired-mode-map' already
+   :map dirvish-mode-map
+   ("a"   . dirvish-quick-access)
+   ("f"   . dirvish-file-info-menu)
+   ("y"   . dirvish-yank-menu)
+   ("N"   . dirvish-narrow)
+   ("^"   . dirvish-history-last)
+   ("h"   . dirvish-history-jump) ; remapped `describe-mode'
+   ("s"   . dirvish-quicksort)    ; remapped `dired-sort-toggle-or-edit'
+   ("v"   . dirvish-vc-menu)      ; remapped `dired-view-file'
+   ("TAB" . dirvish-subtree-toggle)
+   ("M-f" . dirvish-history-go-forward)
+   ("M-b" . dirvish-history-go-backward)
+   ("M-l" . dirvish-ls-switches-menu)
+   ("M-m" . dirvish-mark-menu)
+   ("M-t" . dirvish-layout-toggle)
+   ("M-s" . dirvish-setup-menu)
+   ("M-e" . dirvish-emerge-menu)
+   ("M-j" . dirvish-fd-jump)))
+
+(use-package projectile
+  :diminish
+  :config
+  (setq projectile-completion-system 'ivy)
+  (setq projectile-switch-project-action #'projectile-dired)
+  :bind (:map projectile-mode-map
+              ("C-c p" . projectile-command-map))
+  :init (projectile-mode +1))
+
+(defun projectile-name-tab-by-project-name-or-default ()
+  (let ((project-name (projectile-project-name)))
+    (if (string= "-" project-name)
+        (tab-bar-tab-name-current)
+      project-name)))
+
+(setq tab-bar-tab-name-function #'projectile-name-tab-by-project-name-or-default)
+
+(defun counsel-projectile-switch-project-action-dired-new-tab (project)
+  (let* ((project-name (file-name-nondirectory (directory-file-name project)))
+         (tab-bar-index (tab-bar--tab-index-by-name project-name)))
+    (if tab-bar-index
+        (tab-bar-select-tab (+ tab-bar-index 1))
+      (progn
+        (tab-bar-new-tab)
+        (let ((projectile-switch-project-action 'projectile-dired))
+          (counsel-projectile-switch-project-by-name project))
+        (dirvish-side)))))
+
+(defun projectile-kill-buffers-and-enclosing-tab ()
+  (interactive)
+  (let* ((project-name (projectile-project-name))
+         (tab-bar-index (tab-bar--tab-index-by-name project-name)))
+    (when tab-bar-index
+      (projectile-kill-buffers)
+      (tab-bar-switch-to-recent-tab)
+      (tab-bar-close-tab (+ tab-bar-index 1)))))
+
+(use-package counsel-projectile
+  :after projectile
+  :init (counsel-projectile-mode)
+  :config
+  ;; I want projectile to open dired upon selecting a project.
+  (counsel-projectile-modify-action
+   'counsel-projectile-switch-project-action
+   '((add ("T" counsel-projectile-switch-project-action-dired-new-tab "open in new tab") 1)))
+  :bind (:map projectile-mode-map
+              ("C-c p k" . projectile-kill-buffers-and-enclosing-tab)))
+
+(use-package exec-path-from-shell
+  :demand t
+  :config
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize)))
+
+
+(use-package magit
+  :config
+  (setq magit-git-executable "/usr/bin/git")
+  :bind (("C-x g" . magit-status)
+         ("C-c M-g" . magit-file-popup)))
+
+(use-package gitignore-templates
+  :defer t)
+
+;; (use-package org :ensure org-contrib)
+
+(defvar my-agenda-files '("inbox.org" "projects.org" "habits.org" "agenda.org" "leeslijst.org"))
+
+
+;; TODO: Come back to this later!
+;; (setq org-directory "~/notes"
+;;       org-agenda-files (mapcar
+
+;;                         (lambda (f) (concat (file-name-as-directory org-directory) f))
+
+;;                         my-agenda-files)
+
+;;       org-default-notes-file (concat (file-name-as-directory org-directory) "notes.org"))
+
+(use-package rust-mode)
+
+(use-package lsp-mode
+  :init
+  (setq lsp-keymap-prefix "C-c l")
+  :hook ((python-mode . lsp)
+         (rust-mode . lsp)
+         ;; if you want which-key integration
+         (lsp-mode . lsp-enable-which-key-integration))
+  :config
+  ;; (setq lsp-enable-symbol-highlighting nil
+  ;;       lsp-lens-enable nil
+  ;;       lsp-headerline-breadcrumb-enable nil
+  ;;       lsp-modeline-code-actions-enable nil
+  ;;       lsp-diagnostics-provider :none
+  ;;       lsp-modeline-diagnostics-enable nil
+  ;;       lsp-completion-show-detail nil
+  ;;       lsp-completion-show-kind nil
+  ;;       lsp-pyright-python-executable-cmd "python3"
+  ;;       )
+  :commands (lsp lsp-deferred))
+
+;; optionally
+(use-package lsp-ui :commands lsp-ui-mode)
+;; if you are helm user
+;; (use-package helm-lsp :commands helm-lsp-workspace-symbol)
+;; if you are ivy user
+(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+
+(use-package yasnippet
+  :ensure t
+  :hook ((lsp-mode . yas-minor-mode)))
+
+;; optionally if you want to use debugger
+(use-package dap-mode)
+;; (use-package dap-LANGUAGE) to load the dap adapter for your language
+
+(use-package company
+  :config
+  (add-hook 'prog-mode-hook 'company-mode)
+  (setq company-global-modes '(not text-mode term-mode markdown-mode gfm-mode))
+  (setq company-selection-wrap-around t
+        company-show-numbers t
+        company-tooltip-align-annotations t
+        company-idle-delay 0.5
+        company-require-match nil
+        company-minimum-prefix-length 2)
+  ;; Bind next and previous selection to more intuitive keys
+  (define-key company-active-map (kbd "C-n") 'company-select-next)
+  (define-key company-active-map (kbd "C-p") 'company-select-previous)
+  ;; (add-to-list 'company-frontends 'company-tng-frontend)
+  ;; :bind (("TAB" . 'company-indent-or-complete-common)))
+  :after lsp-mode
+  :hook (lsp-mode . company-mode)
+  :bind (:map company-active-map ("<tab>" . company-complete-selection))
+  (:map lsp-mode-map ("<tab>" . company-indent-or-complete-common)))
+
+(use-package company-prescient
+  :config (company-prescient-mode))
