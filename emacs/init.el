@@ -8,8 +8,24 @@
 (set-fringe-mode 10)
 
 (menu-bar-mode -1)
+(blink-cursor-mode -1)
 
 (setq visible-bell t)
+;; Remember and restore the last cursor location of opened files
+(save-place-mode 1)
+
+;; Move customization variables to a separate file and load it
+(setq custom-file (locate-user-emacs-file "custom-vars.el"))
+(load custom-file 'noerror 'nomessage)
+
+;; Place all auto-save files in one directory
+(setq my-backup-dir (concat user-emacs-directory "backups"))
+(setq backup-directory-alist
+      `((".*" . ,my-backup-dir)))
+(setq auto-save-file-name-transforms
+      `((".*" ,my-backup-dir t)))
+
+
 
 (set-face-attribute 'default nil :font "FiraCode Nerd Font" :height default-font-size)
 
@@ -64,6 +80,8 @@
    :map ivy-reverse-i-search-map)
   :custom
   (ivy-use-virtual-buffers t)
+  (enable-recursive-minibuffers t)
+  (ivy-display-style 'fancy)
   :config
   (ivy-mode 1))
 
@@ -72,6 +90,35 @@
   :bind (("C-M-j" . counsel-switch-buffer))
   :config (counsel-mode))
 
+(use-package prescient
+  :config
+  (prescient-persist-mode))
+
+(use-package ivy-prescient
+  :config (ivy-prescient-mode))
+
+(use-package multiple-cursors
+  :bind (("C-S-c C-S-c" . mc/edit-lines)
+         ("C->"         . mc/mark-next-like-this)
+         ("C-<"         . mc/mark-previous-like-this)
+         ("C-c C-<"     . mc/mark-all-like-this)
+         ("M-<down-mouse-1>" . mc/add-cursor-on-click)
+         ;; ("C-c m" . vr/mc-mark)
+         ))
+
+(use-package expand-region
+  :bind (("C-=" . er/expand-region)
+         ("C--" . er/contract-region)))
+
+(use-package csv-mode
+  :defer t)
+
+(use-package yaml-mode
+  :mode (("\\.yml\\'" . yaml-mode)))
+
+(use-package hl-line
+  :custom-face (hl-line ((t (:extend t))))
+  :hook (after-init . global-hl-line-mode))
 
 ;; Don't forget to run:
 ;; M-x all-the-icons-install-fonts
@@ -147,9 +194,18 @@
 (use-package counsel-projectile
   :config (counsel-projectile-mode))
 
+(use-package exec-path-from-shell
+  :demand t
+  :config
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize)))
+
 (use-package magit
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+(use-package gitignore-templates
+  :defer t)
 
 ;; (use-package forge)
 
@@ -232,7 +288,8 @@
   (lsp-headerline-breadcrumb-mode))
 
 (use-package lsp-mode
-  :hook ((lsp-mode . efs/lsp-mode-setup)
+  :hook ((lsp-mode . (efs/lsp-mode-setup
+		      lsp-enable-which-key-integration))
 	 (prog-mode . lsp-deferred))
   :commands(lsp lsp-deferred)
   :custom ((lsp-keymap-prefix "C-c l"))
@@ -244,9 +301,10 @@
   (lsp-ui-doc-position 'bottom))
 
 (use-package lsp-treemacs
-  :after lsp)
+  :after lsp
+  :commands lsp-treemacs-errors-list)
 
-(use-package lsp-ivy)
+(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
 
 (use-package rust-mode
   ;; :hook (rust-mode . lsp-deferred)
@@ -261,12 +319,23 @@
   :after lsp-mode
   :hook (prog-mode . company-mode)
   :bind (:map company-active-map
-         ("<tab>" . company-complete-selection))
-        (:map lsp-mode-map
-         ("<tab>" . company-indent-or-complete-common))
+              ("<tab>" . company-complete-selection))
+  (:map lsp-mode-map
+        ("<tab>" . company-indent-or-complete-common))
   :custom
-  (company-minimum-prefix-length 1)
-  (company-idle-delay 0.3))
+  (company-selection-wrap-around t)
+  (company-show-numbers t)
+  (company-tooltip-align-annotations t)
+  (company-idle-delay 0.5)
+  (company-require-match nil)
+  (company-minimum-prefix-length 2))
+
+(use-package electric
+  :ensure nil
+  :config (electric-pair-mode 1))
+
+(use-package company-prescient
+  :config (company-prescient-mode))
 
 (use-package company-box
   :hook (company-mode . company-box-mode))
@@ -275,8 +344,10 @@
   :ensure t
   :bind ("C-c r" . quickrun))
 
-(use-package yasnippet :config (yas-global-mode))
+(use-package yasnippet
+  :hook ((lsp-mode . yas-minor-mode)))
 (use-package yasnippet-snippets)
+(use-package dap-mode)
 (use-package flycheck :init (global-flycheck-mode))
 
 (use-package go-mode
