@@ -232,8 +232,8 @@
   (lsp-headerline-breadcrumb-mode))
 
 (use-package lsp-mode
-  :hook (lsp-mode . efs/lsp-mode-setup)
-  ;; (prog-mode . lsp-deferred)
+  :hook ((lsp-mode . efs/lsp-mode-setup)
+	 (prog-mode . lsp-deferred))
   :commands(lsp lsp-deferred)
   :custom ((lsp-keymap-prefix "C-c l"))
   :config (lsp-enable-which-key-integration t))
@@ -249,12 +249,13 @@
 (use-package lsp-ivy)
 
 (use-package rust-mode
-  :hook (rust-mode . lsp-deferred)
+  ;; :hook (rust-mode . lsp-deferred)
   :custom (rust-format-on-save t))
 
 (use-package lsp-java
   :custom (lsp-java-maven-download-sources t)
-  :hook (java-mode . lsp-deferred))
+  ;; :hook (java-mode . lsp-deferred)
+  )
 
 (use-package company
   :after lsp-mode
@@ -265,7 +266,7 @@
          ("<tab>" . company-indent-or-complete-common))
   :custom
   (company-minimum-prefix-length 1)
-  (company-idle-delay 1))
+  (company-idle-delay 0.3))
 
 (use-package company-box
   :hook (company-mode . company-box-mode))
@@ -274,9 +275,13 @@
   :ensure t
   :bind ("C-c r" . quickrun))
 
-;; (use-package yasnippet :config (yas-global-mode))
-;; (use-package yasnippet-snippets)
+(use-package yasnippet :config (yas-global-mode))
+(use-package yasnippet-snippets)
 (use-package flycheck :init (global-flycheck-mode))
+
+(use-package go-mode
+  ;; :hook (go-mode . lsp-deferred)
+  )
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -286,7 +291,7 @@
  '(custom-safe-themes
    '("3d3eef7dd80e89aee44be1ff51d8285045615ea3239358a51818f4deaa5bd558" default))
  '(package-selected-packages
-   '(lsp-ivy lsp-treemacs company-box company company-mode lsp-ui rust-mode lsp-mode smartparens visual-fill-column org-bullets forge magit projectile hydra general all-the-icons helpful ivy-rich counsel swiper which-key rainbow-delimiters ivy doom-themes doom-modeline diminish command-log-mode)))
+   '(go-mode lsp-ivy lsp-treemacs company-box company company-mode lsp-ui rust-mode lsp-mode smartparens visual-fill-column org-bullets forge magit projectile hydra general all-the-icons helpful ivy-rich counsel swiper which-key rainbow-delimiters ivy doom-themes doom-modeline diminish command-log-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
