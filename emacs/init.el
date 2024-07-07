@@ -106,14 +106,21 @@
   ([remap describe-variable] . counsel-describe-variable)
   ([remap describe-key] . helpful-key))
 
+(defun goto-code-dir ()
+  "Navigates to the home directory."
+  (interactive)
+  (find-file "~/code"))
+
 (use-package general
   :config
   (general-create-definer vgowda/leader
     :prefix "C-c")
   (vgowda/leader
     "/" 'swiper
-    "a" 'org-agenda)
+    "a" 'org-agenda
+    "c" 'goto-code-dir)
   (general-override-mode 1))
+
 
 ;; Hydra for sticky keybindings
 (use-package hydra)
@@ -245,7 +252,9 @@
   :hook (rust-mode . lsp-deferred)
   :custom (rust-format-on-save t))
 
-(use-package lsp-java)
+(use-package lsp-java
+  :custom (lsp-java-maven-download-sources t)
+  :hook (java-mode . lsp-deferred))
 
 (use-package company
   :after lsp-mode
@@ -256,7 +265,7 @@
          ("<tab>" . company-indent-or-complete-common))
   :custom
   (company-minimum-prefix-length 1)
-  (company-idle-delay 0.5))
+  (company-idle-delay 1))
 
 (use-package company-box
   :hook (company-mode . company-box-mode))
@@ -265,8 +274,8 @@
   :ensure t
   :bind ("C-c r" . quickrun))
 
-(use-package yasnippet :config (yas-global-mode))
-(use-package yasnippet-snippets)
+;; (use-package yasnippet :config (yas-global-mode))
+;; (use-package yasnippet-snippets)
 (use-package flycheck :init (global-flycheck-mode))
 
 (custom-set-variables
