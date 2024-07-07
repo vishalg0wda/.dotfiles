@@ -334,6 +334,10 @@
   :ensure nil
   :config (electric-pair-mode 1))
 
+(use-package browse-url
+  :custom
+  (browse-url-browser-function 'eww-browse-url))
+
 (use-package company-prescient
   :config (company-prescient-mode))
 
