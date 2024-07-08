@@ -326,10 +326,12 @@
 
 (use-package lsp-mode
   :hook ((lsp-mode . (efs/lsp-mode-setup
-		      lsp-enable-which-key-integration))
+		      lsp-enable-which-key-integration
+		      lsp-inlay-hints-mode))
 	 ((rust-mode python-mode java-mode go-mode) . lsp-deferred))
   :commands(lsp lsp-deferred)
-  :custom ((lsp-keymap-prefix "C-c l"))
+  :custom ((lsp-keymap-prefix "C-c l")
+	   (lsp-inlay-hint-enable t))
   :config (lsp-enable-which-key-integration t))
 
 (use-package lsp-ui
