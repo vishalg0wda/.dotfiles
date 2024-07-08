@@ -162,6 +162,13 @@
   (interactive)
   (find-file "~/code"))
 
+(defun zsh-term ()
+  "Invokes term with zsh shell"
+  (interactive)
+  (term "/usr/bin/zsh"))
+
+
+;; Bind custom functions here
 (use-package general
   :config
   (general-create-definer vgowda/leader
@@ -171,7 +178,7 @@
     "a" 'org-agenda
     "c" 'goto-code-dir
     "e" 'eshell
-    "s" 'term
+    "s" 'zsh-term
     "b" 'eww)
   (general-override-mode 1))
 
