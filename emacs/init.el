@@ -27,7 +27,8 @@
 
 
 
-(set-face-attribute 'default nil :font "FiraCode Nerd Font" :height default-font-size)
+(set-face-attribute 'default nil :font "FiraCode" :height default-font-size)
+
 
 (load-theme 'wombat)
 
@@ -122,7 +123,10 @@
 
 ;; Don't forget to run:
 ;; M-x all-the-icons-install-fonts
+;; M-x nerd-icons-install-fonts
 (use-package all-the-icons)
+(use-package nerd-icons)
+
 
 (use-package doom-modeline
   :custom ((doom-modeline-height 15))
