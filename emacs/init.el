@@ -86,6 +86,32 @@
   :config
   (ivy-mode 1))
 
+;; Bind custom functions here
+(use-package general
+  :config
+  (general-create-definer vgowda/leader
+    :prefix "C-c")
+  (vgowda/leader
+    "/" 'swiper
+    "a" 'org-agenda
+    "c" 'goto-code-dir
+    "e" 'eshell
+    "s" 'zsh-term
+    "b" 'eww)
+  (general-override-mode 1))
+
+
+;; Hydra for sticky keybindings
+(use-package hydra)
+
+(defhydra hydra-text-scale (:timeout 4)
+  "scale text"
+  ("j" text-scale-increase "in")
+  ("k" text-scale-decrease "out")
+  ("f" nil "finished" :exit t))
+(vgowda/leader
+  "ts" '(hydra-text-scale/body :which-key "scale text"))
+
 (use-package counsel
   :after ivy
   :bind (("C-M-j" . counsel-switch-buffer))
@@ -107,7 +133,17 @@
          ;; ("C-c m" . vr/mc-mark)
          ))
 
-(winner-mode 1)
+(defhydra winner-nav ()
+  "cycle through window layouts"
+  ("j" winner-undo "prev")
+  ("l" winner-redo "next"))
+
+(use-package winner
+  :bind (:map winner-mode-map
+	      ("C-c w" . winner-nav/body))
+  :config
+  (winner-mode 1))
+
 
 (use-package expand-region
   :bind (("C-=" . er/expand-region)
@@ -183,18 +219,6 @@
     "s" 'zsh-term
     "b" 'eww)
   (general-override-mode 1))
-
-
-;; Hydra for sticky keybindings
-(use-package hydra)
-
-(defhydra hydra-text-scale (:timeout 4)
-  "scale text"
-  ("j" text-scale-increase "in")
-  ("k" text-scale-decrease "out")
-  ("f" nil "finished" :exit t))
-(vgowda/leader
-  "ts" '(hydra-text-scale/body :which-key "scale text"))
 
 (use-package projectile
   :diminish projectile-mode
