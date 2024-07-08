@@ -165,7 +165,10 @@
   (vgowda/leader
     "/" 'swiper
     "a" 'org-agenda
-    "c" 'goto-code-dir)
+    "c" 'goto-code-dir
+    "e" 'eshell
+    "s" 'term
+    "b" 'eww)
   (general-override-mode 1))
 
 
@@ -265,14 +268,11 @@
   :init 
   :config (key-chord-mode 1)
   (setq key-chord-two-keys-delay 0.4)
-  (setq key-chord-one-key-delay 0.5))
+  (setq key-chord-one-key-delay 0.3))
 
 (use-package avy 
   :ensure t
-  :chords
-  ("jc" . avy-goto-char)
-  ("jw" . avy-goto-word-1)
-  ("jl" . avy-goto-line))
+  :bind ("C-;" . avy-goto-char-2))
 
 (use-package ace-window
   :config
@@ -290,7 +290,7 @@
 (use-package lsp-mode
   :hook ((lsp-mode . (efs/lsp-mode-setup
 		      lsp-enable-which-key-integration))
-	 (prog-mode . lsp-deferred))
+	 ((rust-mode python-mode java-mode go-mode) . lsp-deferred))
   :commands(lsp lsp-deferred)
   :custom ((lsp-keymap-prefix "C-c l"))
   :config (lsp-enable-which-key-integration t))
@@ -358,18 +358,7 @@
   ;; :hook (go-mode . lsp-deferred)
   )
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   '("3d3eef7dd80e89aee44be1ff51d8285045615ea3239358a51818f4deaa5bd558" default))
- '(package-selected-packages
-   '(go-mode lsp-ivy lsp-treemacs company-box company company-mode lsp-ui rust-mode lsp-mode smartparens visual-fill-column org-bullets forge magit projectile hydra general all-the-icons helpful ivy-rich counsel swiper which-key rainbow-delimiters ivy doom-themes doom-modeline diminish command-log-mode)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+(use-package docker
+  :ensure t
+  :bind ("C-c d" . docker))
+
