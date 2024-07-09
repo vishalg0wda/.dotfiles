@@ -10,6 +10,9 @@
 (menu-bar-mode -1)
 (blink-cursor-mode -1)
 
+(column-number-mode)
+(global-display-line-numbers-mode t)
+
 (setq visible-bell t)
 ;; Remember and restore the last cursor location of opened files
 (save-place-mode 1)
@@ -25,19 +28,13 @@
 (setq auto-save-file-name-transforms
       `((".*" ,my-backup-dir t)))
 
-
-
 (set-face-attribute 'default nil :font "FiraCode" :height default-font-size)
-
 
 (load-theme 'wombat)
 
 ;; Make C-g/ESC quit prompts
 (global-set-key (kbd "C-g") 'keyboard-escape-quit)
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-
-;; Uncomment regions
-;; (global-set-key (kbd "C-M-;") 'uncomment-region) 
 
 (require 'package)
 
@@ -55,9 +52,6 @@
 
 (require 'use-package)
 (setq use-package-always-ensure t)
-
-(column-number-mode)
-(global-display-line-numbers-mode t)
 
 ;; Disable line numbers for some modes
 (dolist (hook '(org-mode-hook
@@ -86,6 +80,10 @@
   :config
   (ivy-mode 1))
 
+(use-package ivy-rich
+  :init (ivy-rich-mode 1))
+
+
 ;; Bind custom functions here
 (use-package general
   :config
@@ -99,7 +97,6 @@
     "s" 'zsh-term
     "b" 'eww)
   (general-override-mode 1))
-
 
 ;; Hydra for sticky keybindings
 (use-package hydra)
@@ -133,18 +130,6 @@
          ;; ("C-c m" . vr/mc-mark)
          ))
 
-(defhydra winner-nav ()
-  "cycle through window layouts"
-  ("j" winner-undo "prev")
-  ("l" winner-redo "next"))
-
-(use-package winner
-  :bind (:map winner-mode-map
-	      ("C-c w" . winner-nav/body))
-  :config
-  (winner-mode 1))
-
-
 (use-package expand-region
   :bind (("C-=" . er/expand-region)
          ("C--" . er/contract-region)))
@@ -165,7 +150,6 @@
 (use-package all-the-icons)
 (use-package nerd-icons)
 
-
 (use-package doom-modeline
   :custom ((doom-modeline-height 15))
   :config (doom-modeline-mode 1))
@@ -181,9 +165,6 @@
   :diminish which-key-mode
   :config
   (setq which-key-idle-delay 0.75))
-
-(use-package ivy-rich
-  :init (ivy-rich-mode 1))
 
 (use-package helpful
   :custom
@@ -205,6 +186,17 @@
   (interactive)
   (term "/usr/bin/zsh"))
 
+(defhydra winner-nav ()
+  "cycle through window layouts"
+  ("j" winner-undo "prev")
+  ("l" winner-redo "next"))
+
+;; (use-package winner
+;;   ;; :bind ("C-c w" . winner-nav/body)
+;;   :config
+;;   (winner-mode 1))
+
+(winner-mode 1)
 
 ;; Bind custom functions here
 (use-package general
@@ -217,22 +209,9 @@
     "c" 'goto-code-dir
     "e" 'eshell
     "s" 'zsh-term
-    "b" 'eww)
+    "b" 'eww
+    "w" 'winner-nav/body)
   (general-override-mode 1))
-
-(use-package projectile
-  :diminish projectile-mode
-  :config (projectile-mode)
-  :custom ((projectile-completion-system 'ivy)
-	   (project-switch-project-action 'project-dired))
-  :bind-keymap
-  ("C-c p" . projectile-command-map)
-  :init
-  (when (file-directory-p "~/code")
-    (setq projectile-project-search-path '("~/code"))))
-
-(use-package counsel-projectile
-  :config (counsel-projectile-mode))
 
 (use-package exec-path-from-shell
   :demand t
@@ -240,14 +219,9 @@
   (when (memq window-system '(mac ns x))
     (exec-path-from-shell-initialize)))
 
-(use-package magit
+(use-package browse-url
   :custom
-  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
-
-(use-package gitignore-templates
-  :defer t)
-
-;; (use-package forge)
+  (browse-url-browser-function 'eww-browse-url))
 
 ;; Org Mode Configuration ------------------------------------------------------
 
@@ -294,23 +268,6 @@
 (use-package visual-fill-column
   :hook (org-mode . efs/org-mode-visual-fill))
 
-(use-package smartparens
-  :hook (prog-mode text-mode markdown-mode)
-  :config
-  (require 'smartparens-config))
-
-
-(use-package use-package-chords
-  :ensure t
-  :init 
-  :config (key-chord-mode 1)
-  (setq key-chord-two-keys-delay 0.4)
-  (setq key-chord-one-key-delay 0.3))
-
-(use-package avy 
-  :ensure t
-  :bind ("C-:" . avy-goto-char))
-
 (use-package ace-window
   :config
   (set-face-attribute
@@ -320,47 +277,50 @@
   :bind (("M-o" . ace-window))
   :custom (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
 
-(defun efs/lsp-mode-setup ()
-  (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
-  (lsp-headerline-breadcrumb-mode))
+;; ================================IDE Config ====================================
+(use-package projectile
+  :diminish projectile-mode
+  :config (projectile-mode)
+  :custom ((projectile-completion-system 'ivy)
+	   (project-switch-project-action 'project-dired))
+  :bind-keymap
+  ("C-c p" . projectile-command-map)
+  :init
+  (when (file-directory-p "~/code")
+    (setq projectile-project-search-path '("~/code"))))
 
-(use-package lsp-mode
-  :hook ((lsp-mode . (efs/lsp-mode-setup
-		      lsp-enable-which-key-integration
-		      lsp-inlay-hints-mode))
-	 ((rust-mode python-mode java-mode go-mode) . lsp-deferred))
-  :commands(lsp lsp-deferred)
-  :custom ((lsp-keymap-prefix "C-c l")
-	   (lsp-inlay-hint-enable t))
-  :config (lsp-enable-which-key-integration t))
+(use-package counsel-projectile
+  :config (counsel-projectile-mode))
 
-(use-package lsp-ui
-  :hook (lsp-mode . lsp-ui-mode)
+(use-package magit
   :custom
-  (lsp-ui-doc-position 'bottom))
+  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
-(use-package lsp-treemacs
-  :after lsp
-  :commands lsp-treemacs-errors-list)
+(use-package gitignore-templates
+  :defer t)
 
-(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+;; (use-package forge)
 
-(use-package rust-mode
-  ;; :hook (rust-mode . lsp-deferred)
-  :custom (rust-format-on-save t))
+(use-package smartparens
+  :hook (prog-mode text-mode markdown-mode)
+  :config
+  (require 'smartparens-config))
 
-(use-package lsp-java
-  :custom (lsp-java-maven-download-sources t)
-  ;; :hook (java-mode . lsp-deferred)
-  )
+(use-package avy 
+  :ensure t
+  :bind ("C-:" . avy-goto-char))
+
+(use-package electric
+  :ensure nil
+  :config (electric-pair-mode 1))
 
 (use-package company
   :after lsp-mode
-  :hook (prog-mode . company-mode)
-  :bind (:map company-active-map
-              ("<tab>" . company-complete-selection))
-  (:map lsp-mode-map
-        ("<tab>" . company-indent-or-complete-common))
+  :hook prog-mode
+  :bind ((:map company-active-map
+               ("<tab>" . company-complete-selection))
+	 (:map lsp-mode-map
+               ("<tab>" . company-indent-or-complete-common)))
   :custom
   (company-selection-wrap-around t)
   (company-show-numbers t)
@@ -369,35 +329,82 @@
   (company-require-match nil)
   (company-minimum-prefix-length 2))
 
-(use-package electric
-  :ensure nil
-  :config (electric-pair-mode 1))
-
-(use-package browse-url
-  :custom
-  (browse-url-browser-function 'eww-browse-url))
-
 (use-package company-prescient
   :config (company-prescient-mode))
 
 (use-package company-box
   :hook (company-mode . company-box-mode))
 
-(use-package quickrun 
-  :ensure t
-  :bind ("C-c r" . quickrun))
-
 (use-package yasnippet
   :hook ((lsp-mode . yas-minor-mode)))
 (use-package yasnippet-snippets)
-(use-package dap-mode)
-(use-package flycheck :init (global-flycheck-mode))
 
-(use-package go-mode
-  ;; :hook (go-mode . lsp-deferred)
-  )
+(use-package flycheck
+  :hook prog-mode)
 
 (use-package docker
   :ensure t
   :bind ("C-c d" . docker))
+
+;; ================================LSP CONFIG================================
+;; (defun efs/lsp-mode-setup ()
+;;   (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+;;   (lsp-headerline-breadcrumb-mode))
+
+(use-package lsp-mode
+  :commands (lsp lsp-deferred)
+  :custom
+  (lsp-keymap-prefix "C-c l")
+  (lsp-inlay-hint-enable t)
+  (lsp-rust-analyzer-server-display-inlay-hints t)
+  (lsp-eldoc-render-all f)
+  :hook rust-mode python-mode java-mode go-mode
+  :bind (:map lsp-mode-map
+	      ("C-c l p d" . lsp-ui-peek-find-definitions)
+	      ("C-c l p r" . lsp-ui-peek-find-references)
+	      ("C-c l p i" . lsp-ui-peek-find-implementation)
+	      ("C-c l m" . lsp-ui-imenu)
+	      ("C-c l s" . lsp-ivy-workspace-symbol))
+  :config (lsp-enable-which-key-integration t))
+
+(use-package lsp-ui
+  :commands lsp-ui-mode
+  :hook lsp-mode
+  :custom
+  (lsp-ui-sideline-enable nil)
+  (lsp-ui-peek-enable t)
+  (lsp-ui-imenu-enable t)
+  (lsp-ui-doc-enable t)
+  (lsp-ui-doc-position 'bottom))
+
+(use-package lsp-treemacs
+  :after lsp
+  :commands lsp-treemacs-errors-list)
+
+(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+
+(use-package lsp-java
+  :custom (lsp-java-maven-download-sources t))
+
+(use-package dap-mode)
+
+(use-package go-mode)
+
+
+(use-package tree-sitter-langs
+  :ensure t
+  :after tree-sitter)
+
+(use-package rust-mode
+  ;; :init (setq rust-mode-treesitter-derive t)
+  :bind (:map rust-mode-map
+	      ("C-c C-c" . rust-run)
+	      ("C-c C-t" . rust-test)
+	      ("C-c C-f" . rust-format-buffer))
+  :custom (rust-format-on-save t))
+
+(use-package cargo
+  :hook (rust-mode . cargo-minor-mode))
+
+
 
