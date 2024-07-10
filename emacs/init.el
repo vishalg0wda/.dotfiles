@@ -249,6 +249,8 @@
 
 (use-package org
   :hook (org-mode . efs/org-mode-setup)
+  :custom
+  (org-agenda-files '("~/orgs"))
   :config
   (setq org-ellipsis " ▾")
   ;; (setq org-hide-emphasis-markers t)
