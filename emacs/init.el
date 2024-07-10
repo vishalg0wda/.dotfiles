@@ -1,5 +1,5 @@
 
-(defvar default-font-size 120)
+(defvar default-font-size 130)
 (setq inhibit-startup-message t)
 
 (scroll-bar-mode -1)
@@ -28,7 +28,7 @@
 (setq auto-save-file-name-transforms
       `((".*" ,my-backup-dir t)))
 
-(set-face-attribute 'default nil :font "FiraCode" :height default-font-size)
+(set-face-attribute 'default nil :font "Fira Code" :height default-font-size)
 
 (load-theme 'wombat)
 
@@ -338,6 +338,7 @@
   :hook (company-mode . company-box-mode))
 
 (use-package yasnippet
+  :after lsp-mode
   :hook ((lsp-mode . yas-minor-mode)))
 (use-package yasnippet-snippets)
 
@@ -359,7 +360,7 @@
   (lsp-keymap-prefix "C-c l")
   (lsp-inlay-hint-enable t)
   (lsp-rust-analyzer-server-display-inlay-hints t)
-  (lsp-eldoc-render-all f)
+  (lsp-eldoc-render-all nil)
   :hook rust-mode python-mode java-mode go-mode
   :bind (:map lsp-mode-map
 	      ("C-c l p d" . lsp-ui-peek-find-definitions)
