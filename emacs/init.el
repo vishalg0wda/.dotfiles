@@ -197,6 +197,7 @@
 ;;   (winner-mode 1))
 
 (winner-mode 1)
+(add-hook 'ediff-after-quit-hook-internal 'winner-undo)
 
 ;; Bind custom functions here
 (use-package general
@@ -296,7 +297,8 @@
 
 (use-package magit
   :custom
-  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
+  (ediff-window-setup-function #'ediff-setup-windows-plain))
 
 (use-package gitignore-templates
   :defer t)
