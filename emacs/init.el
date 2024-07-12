@@ -380,6 +380,7 @@
   :hook python-mode java-mode go-mode
   :bind (:map lsp-mode-map
 	      ("C-c l p d" . lsp-ui-peek-find-definitions)
+	      ("C-c l d" . lsp-describe-thing-at-point)
 	      ("C-c l p r" . lsp-ui-peek-find-references)
 	      ("C-c l p i" . lsp-ui-peek-find-implementation)
 	      ("C-c l m" . lsp-ui-imenu)
