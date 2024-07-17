@@ -418,6 +418,8 @@
 
 (use-package rustic
   :ensure
+  :custom
+  (rustic-rustfmt-config-alist '((edition . "2021")))
   :bind (:map rustic-mode-map
               ("M-j" . lsp-ui-imenu)
               ("M-?" . lsp-find-references)
