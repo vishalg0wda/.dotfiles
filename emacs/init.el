@@ -371,12 +371,12 @@
   (lsp-inlay-hint-enable t)
   ;; These are optional configurations. See https://emacs-lsp.github.io/lsp-mode/page/lsp-rust-analyzer/#lsp-rust-analyzer-display-chaining-hints for a full list
   (lsp-rust-analyzer-display-lifetime-elision-hints-enable "skip_trivial")
-  (lsp-rust-analyzer-display-chaining-hints t)
+  (lsp-rust-analyzer-display-chaining-hints nil)
   (lsp-rust-analyzer-display-lifetime-elision-hints-use-parameter-names nil)
   (lsp-rust-analyzer-display-closure-return-type-hints t)
   (lsp-rust-analyzer-display-parameter-hints nil)
   (lsp-rust-analyzer-display-reborrow-hints nil)
-  ;; (lsp-eldoc-render-all nil)
+  (lsp-eldoc-render-all nil)
   :hook python-mode java-mode go-mode
   :bind (:map lsp-mode-map
 	      ("C-c l p d" . lsp-ui-peek-find-definitions)
