@@ -409,6 +409,24 @@
   :custom (lsp-java-maven-download-sources t))
 
 (use-package dap-mode)
+;; (use-package dap-mode
+;;   :ensure
+;;   :config
+;;   (dap-ui-mode)
+;;   (dap-ui-controls-mode 1)
+
+;;   (require 'dap-lldb)
+;;   (require 'dap-gdb-lldb)
+;;   ;; installs .extension/vscode
+;;   (dap-gdb-lldb-setup)
+;;   (dap-register-debug-template
+;;    "Rust::LLDB Run Configuration"
+;;    (list :type "lldb-vscode"
+;;          :request "launch"
+;;          :name "LLDB::Run"
+;; 	 :gdbpath "rust-lldb"
+;;          :target nil
+;;          :cwd nil)))
 
 (use-package go-mode)
 
