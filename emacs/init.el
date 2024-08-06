@@ -13,7 +13,7 @@
 (column-number-mode)
 (global-display-line-numbers-mode t)
 
-(setq visible-bell t)
+(setq visible-bell nil)
 ;; Remember and restore the last cursor location of opened files
 (save-place-mode 1)
 
@@ -28,7 +28,7 @@
 (setq auto-save-file-name-transforms
       `((".*" ,my-backup-dir t)))
 
-(set-face-attribute 'default nil :font "Fira Code" :height default-font-size)
+;; (set-face-attribute 'default nil :font "Fira Code" :height default-font-size)
 
 (load-theme 'wombat)
 

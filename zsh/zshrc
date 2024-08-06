@@ -56,3 +56,8 @@ source $DOTFILES/zsh/completion.zsh
 # +---------------------+
 
 source $DOTFILES/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+if [ -e "/opt/homebrew/opt/kube-ps1/share/kube-ps1.sh" ]; then
+    source "/opt/homebrew/opt/kube-ps1/share/kube-ps1.sh"
+    PS1='$(kube_ps1)'$PS1
+fi
